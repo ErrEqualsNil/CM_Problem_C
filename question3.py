@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures
 
-data = pd.read_csv("data/有插层.csv")
+data = pd.read_csv("data/无插层.csv")
 achieve_distance = np.array(data['接收距离(cm)']).reshape(-1, 1)
 hot_wind_speed = np.array(data['热风速度(r/min)']).reshape(-1, 1)
 thickness = np.array(data['厚度mm']).reshape(-1, 1)
@@ -15,47 +15,81 @@ air_permeability = np.array(data['透气性 mm/s']).reshape(-1, 1)
 filtration_resistance = np.array(data['过滤阻力Pa']).reshape(-1, 1)
 filtration_efficiency = np.array(data['过滤效率（%）']).reshape(-1, 1)
 
-
-#  厚度与孔隙率的关系
+# 过滤阻力与过滤效率的关系
 plt.figure(figsize=(10, 10))
-transform = PolynomialFeatures(degree=2)
-transform.fit(thickness)
-x = transform.transform(thickness)
 model = LinearRegression()
-model.fit(x, porosity)
-pred_y = model.predict(x)
+model.fit(filtration_resistance, filtration_efficiency)
+pred_y = model.predict(filtration_resistance)
 
 outliers_idx = []
-for i in range(len(thickness)):
-    threshold = 3  # 自定的
-    if abs(pred_y[i] - porosity[i]) > threshold:
+for i in range(len(filtration_resistance)):
+    threshold = 10  # 自定的
+    if abs(pred_y[i] - filtration_efficiency[i]) > threshold:
         outliers_idx.append(i)
 
-for idx in outliers_idx:
-    plt.plot(thickness[idx], porosity[idx], 'r.', label="outliers")
-thickness = np.delete(thickness, outliers_idx).reshape(-1, 1)
-porosity = np.delete(porosity, outliers_idx).reshape(-1, 1)
-plt.plot(thickness, porosity, 'g.', label="original data")
+plt.plot(filtration_resistance[outliers_idx], filtration_efficiency[outliers_idx], 'r.', label="outliers")
+filtration_resistance = np.delete(filtration_resistance, outliers_idx).reshape(-1, 1)
+filtration_efficiency = np.delete(filtration_efficiency, outliers_idx).reshape(-1, 1)
+plt.plot(filtration_resistance, filtration_efficiency, 'g.', label="original data")
 
 model = LinearRegression()
-transform = PolynomialFeatures(degree=2)
-transform.fit(thickness)
-x = transform.transform(thickness)
-model.fit(x, porosity)
-pred_y = model.predict(x)
-print(f"porosity = {model.coef_[0][2]} * thickness^2 + {model.coef_[0][1]} * thickness + {model.intercept_[0]}")
+model.fit(filtration_resistance, filtration_efficiency)
+pred_y = model.predict(filtration_resistance)
+print(f"filtration_efficiency = {model.coef_[0]} * filtration_resistance + {model.intercept_[0]}")
 
-loss = mean_squared_error(porosity, pred_y)
+loss = mean_squared_error(filtration_efficiency, pred_y)
 print(f"loss: {loss}")
 
-sorted_x = np.sort(thickness, axis=0)
-transform = PolynomialFeatures(degree=2)
-transform.fit(sorted_x)
-log_sorted_x = transform.transform(sorted_x)
-sorted_pred_y = model.predict(log_sorted_x)
+sorted_x = np.sort(filtration_resistance, axis=0)
+sorted_pred_y = model.predict(sorted_x)
 plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
-plt.xlabel("thickness(mm)")
-plt.ylabel("porosity(%)")
+plt.xlabel("filtration_resistance(Pa)")
+plt.ylabel("filtration_efficiency(%)")
 plt.legend()
-plt.title("Thickness - Porosity Regression Result (Interlayer)")
-plt.savefig("results/Thickness_Porosity_Interlayer.png")
+plt.title("filtration_resistance - filtration_efficiency Regression Result (No-Interlayer)")
+plt.savefig("results/filtration_resistance-filtration_efficiency-No_interlayer.png")
+
+#  厚度与孔隙率的关系
+# plt.figure(figsize=(10, 10))
+# transform = PolynomialFeatures(degree=2)
+# transform.fit(thickness)
+# x = transform.transform(thickness)
+# model = LinearRegression()
+# model.fit(x, porosity)
+# pred_y = model.predict(x)
+#
+# outliers_idx = []
+# for i in range(len(thickness)):
+#     threshold = 3  # 自定的
+#     if abs(pred_y[i] - porosity[i]) > threshold:
+#         outliers_idx.append(i)
+#
+# for idx in outliers_idx:
+#     plt.plot(thickness[idx], porosity[idx], 'r.', label="outliers")
+# thickness = np.delete(thickness, outliers_idx).reshape(-1, 1)
+# porosity = np.delete(porosity, outliers_idx).reshape(-1, 1)
+# plt.plot(thickness, porosity, 'g.', label="original data")
+#
+# model = LinearRegression()
+# transform = PolynomialFeatures(degree=2)
+# transform.fit(thickness)
+# x = transform.transform(thickness)
+# model.fit(x, porosity)
+# pred_y = model.predict(x)
+# print(f"porosity = {model.coef_[0][2]} * thickness^2 + {model.coef_[0][1]} * thickness + {model.intercept_[0]}")
+#
+# loss = mean_squared_error(porosity, pred_y)
+# print(f"loss: {loss}")
+#
+# sorted_x = np.sort(thickness, axis=0)
+# transform = PolynomialFeatures(degree=2)
+# transform.fit(sorted_x)
+# log_sorted_x = transform.transform(sorted_x)
+# sorted_pred_y = model.predict(log_sorted_x)
+# plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
+# plt.xlabel("thickness(mm)")
+# plt.ylabel("porosity(%)")
+# plt.legend()
+# plt.title("Thickness - Porosity Regression Result (Interlayer)")
+# plt.savefig("results/Thickness_Porosity_Interlayer.png")
+

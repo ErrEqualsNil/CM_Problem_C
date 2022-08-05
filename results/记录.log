@@ -5,3 +5,11 @@ mse: 0.017394581860724283
 [Thickness_Porosity_Interlayer]
 porosity = -0.9544868880036277 * thickness^2 + 6.584892184364598 * thickness + 85.40929530619565
 mse: 0.022191236944405085
+
+[filtration_resistance-filtration_efficiency-Interlayer]
+filtration_efficiency = [0.8185463] * filtration_resistance + 24.84052854567666
+loss: 1.7845222090345034
+
+[filtration_resistance-filtration_efficiency-No_interlayer]
+filtration_efficiency = [1.48315702] * filtration_resistance + -9.657182959002618
+loss: 17.909859228655126
