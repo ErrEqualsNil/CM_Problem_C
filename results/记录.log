@@ -1,0 +1,7 @@
+[Thickness_Porosity_No_interlayer]
+porosity = -3.6139363274015865 * thickness^2 + 16.44535195020148 * thickness + 76.04686618689936
+mse: 0.017394581860724283
+
+[Thickness_Porosity_Interlayer]
+porosity = -0.9544868880036277 * thickness^2 + 6.584892184364598 * thickness + 85.40929530619565
+mse: 0.022191236944405085
