@@ -15,39 +15,62 @@ air_permeability = np.array(data['透气性 mm/s']).reshape(-1, 1)
 filtration_resistance = np.array(data['过滤阻力Pa']).reshape(-1, 1)
 filtration_efficiency = np.array(data['过滤效率（%）']).reshape(-1, 1)
 
-# 过滤阻力与厚度的关系
+# 工艺参数与厚度的关系
 plt.figure(figsize=(10, 10))
-model = LinearRegression()
-model.fit(thickness, filtration_resistance)
-pred_y = model.predict(thickness)
+ax = plt.axes(projection="3d")
 
-outliers_idx = []
-for i in range(len(thickness)):
-    threshold = 10  # 自定的
-    if abs(pred_y[i] - filtration_resistance[i]) > threshold:
-        outliers_idx.append(i)
-
-plt.plot(thickness[outliers_idx], filtration_resistance[outliers_idx], 'r.', label="outliers")
-thickness = np.delete(thickness, outliers_idx).reshape(-1, 1)
-filtration_resistance = np.delete(filtration_resistance, outliers_idx).reshape(-1, 1)
-plt.plot(thickness, filtration_resistance, 'g.', label="original data")
+ax.plot(achieve_distance.reshape(-1), hot_wind_speed.reshape(-1), thickness.reshape(-1), 'g.', label="original data")
 
 model = LinearRegression()
-model.fit(thickness, filtration_resistance)
-pred_y = model.predict(thickness)
-print(f"filtration_resistance = {model.coef_[0]} * thickness + {model.intercept_[0]}")
+x = np.concatenate([achieve_distance, hot_wind_speed], axis=1)
+model.fit(x, thickness)
+pred_y = model.predict(x)
+print(f"filtration_resistance = {model.coef_[0][0]} * achieve_distance + {model.coef_[0][1]} * hot_wind_speed + {model.intercept_[0]}")
 
-loss = mean_squared_error(filtration_resistance, pred_y)
+loss = mean_squared_error(thickness, pred_y)
 print(f"loss: {loss}")
 
-sorted_x = np.sort(thickness, axis=0)
-sorted_pred_y = model.predict(sorted_x)
-plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
-plt.xlabel("thickness(mm)")
-plt.ylabel("filtration_resistance(Pa)")
-plt.legend()
-plt.title("thickness - filtration_resistance Regression Result (No-Interlayer)")
-plt.savefig("results/thickness-filtration_resistance-No_interlayer.png")
+ax.plot_trisurf(achieve_distance.reshape(-1), hot_wind_speed.reshape(-1), pred_y.reshape(-1), cmap='Blues', label="Regression Model")
+ax.set_xlabel("achieve_distance(cm)")
+ax.set_ylabel("hot_wind_speed(r/min)")
+ax.set_zlabel("thickness(mm)")
+ax.set_title("achieve_distance & hot_wind_speed - thickness Regression Result (No-Interlayer)")
+ax.view_init(10, 30)
+plt.savefig("results/achieve_distance-&-hot_wind_speed-thickness-No_Interlayer.png")
+
+# 过滤阻力与厚度的关系
+# plt.figure(figsize=(10, 10))
+# model = LinearRegression()
+# model.fit(thickness, filtration_resistance)
+# pred_y = model.predict(thickness)
+#
+# outliers_idx = []
+# for i in range(len(thickness)):
+#     threshold = 10  # 自定的
+#     if abs(pred_y[i] - filtration_resistance[i]) > threshold:
+#         outliers_idx.append(i)
+#
+# plt.plot(thickness[outliers_idx], filtration_resistance[outliers_idx], 'r.', label="outliers")
+# thickness = np.delete(thickness, outliers_idx).reshape(-1, 1)
+# filtration_resistance = np.delete(filtration_resistance, outliers_idx).reshape(-1, 1)
+# plt.plot(thickness, filtration_resistance, 'g.', label="original data")
+#
+# model = LinearRegression()
+# model.fit(thickness, filtration_resistance)
+# pred_y = model.predict(thickness)
+# print(f"filtration_resistance = {model.coef_[0]} * thickness + {model.intercept_[0]}")
+#
+# loss = mean_squared_error(filtration_resistance, pred_y)
+# print(f"loss: {loss}")
+#
+# sorted_x = np.sort(thickness, axis=0)
+# sorted_pred_y = model.predict(sorted_x)
+# plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
+# plt.xlabel("thickness(mm)")
+# plt.ylabel("filtration_resistance(Pa)")
+# plt.legend()
+# plt.title("thickness - filtration_resistance Regression Result (No-Interlayer)")
+# plt.savefig("results/thickness-filtration_resistance-No_interlayer.png")
 
 
 # 过滤阻力与过滤效率的关系

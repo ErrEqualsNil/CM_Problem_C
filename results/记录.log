@@ -21,3 +21,11 @@ loss: 2.2694770841928995
 [thickness-filtration_resistance-No_interlayer]
 filtration_resistance = [-10.06660615] * thickness + 45.000848272662935
 loss: 38.71422125553685
+
+[achieve_distance-&-hot_wind_speed-thickness-Interlayer]
+filtration_resistance = 0.054188 * achieve_distance + 0.0018418 * hot_wind_speed + -0.86036
+loss: 0.005348241600000005
+
+[achieve_distance-&-hot_wind_speed-thickness-No_Interlayer]
+filtration_resistance = 0.03955999999999999 * achieve_distance + 0.0012640000000000004 * hot_wind_speed + -0.9319999999999999
+loss: 0.03033695999999999
