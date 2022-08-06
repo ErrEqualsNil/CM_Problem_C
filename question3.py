@@ -22,10 +22,10 @@ ax = plt.axes(projection="3d")
 ax.plot(achieve_distance.reshape(-1), hot_wind_speed.reshape(-1), thickness.reshape(-1), 'g.', label="original data")
 
 model = LinearRegression()
-x = np.concatenate([achieve_distance, hot_wind_speed], axis=1)
+x = np.concatenate([achieve_distance, hot_wind_speed, hot_wind_speed ** 2], axis=1)
 model.fit(x, thickness)
 pred_y = model.predict(x)
-print(f"filtration_resistance = {model.coef_[0][0]} * achieve_distance + {model.coef_[0][1]} * hot_wind_speed + {model.intercept_[0]}")
+print(f"filtration_resistance = {model.coef_[0][0]} * achieve_distance + {model.coef_[0][1]} * hot_wind_speed + {model.coef_[0][2]} * hot_wind_speed^2 + {model.intercept_[0]}")
 
 loss = mean_squared_error(thickness, pred_y)
 print(f"loss: {loss}")
