@@ -15,39 +15,74 @@ air_permeability = np.array(data['透气性 mm/s']).reshape(-1, 1)
 filtration_resistance = np.array(data['过滤阻力Pa']).reshape(-1, 1)
 filtration_efficiency = np.array(data['过滤效率（%）']).reshape(-1, 1)
 
-# 过滤阻力与过滤效率的关系
+# 过滤阻力与厚度的关系
 plt.figure(figsize=(10, 10))
 model = LinearRegression()
-model.fit(filtration_resistance, filtration_efficiency)
-pred_y = model.predict(filtration_resistance)
+model.fit(thickness, filtration_resistance)
+pred_y = model.predict(thickness)
 
 outliers_idx = []
-for i in range(len(filtration_resistance)):
+for i in range(len(thickness)):
     threshold = 10  # 自定的
-    if abs(pred_y[i] - filtration_efficiency[i]) > threshold:
+    if abs(pred_y[i] - filtration_resistance[i]) > threshold:
         outliers_idx.append(i)
 
-plt.plot(filtration_resistance[outliers_idx], filtration_efficiency[outliers_idx], 'r.', label="outliers")
+plt.plot(thickness[outliers_idx], filtration_resistance[outliers_idx], 'r.', label="outliers")
+thickness = np.delete(thickness, outliers_idx).reshape(-1, 1)
 filtration_resistance = np.delete(filtration_resistance, outliers_idx).reshape(-1, 1)
-filtration_efficiency = np.delete(filtration_efficiency, outliers_idx).reshape(-1, 1)
-plt.plot(filtration_resistance, filtration_efficiency, 'g.', label="original data")
+plt.plot(thickness, filtration_resistance, 'g.', label="original data")
 
 model = LinearRegression()
-model.fit(filtration_resistance, filtration_efficiency)
-pred_y = model.predict(filtration_resistance)
-print(f"filtration_efficiency = {model.coef_[0]} * filtration_resistance + {model.intercept_[0]}")
+model.fit(thickness, filtration_resistance)
+pred_y = model.predict(thickness)
+print(f"filtration_resistance = {model.coef_[0]} * thickness + {model.intercept_[0]}")
 
-loss = mean_squared_error(filtration_efficiency, pred_y)
+loss = mean_squared_error(filtration_resistance, pred_y)
 print(f"loss: {loss}")
 
-sorted_x = np.sort(filtration_resistance, axis=0)
+sorted_x = np.sort(thickness, axis=0)
 sorted_pred_y = model.predict(sorted_x)
 plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
-plt.xlabel("filtration_resistance(Pa)")
-plt.ylabel("filtration_efficiency(%)")
+plt.xlabel("thickness(mm)")
+plt.ylabel("filtration_resistance(Pa)")
 plt.legend()
-plt.title("filtration_resistance - filtration_efficiency Regression Result (No-Interlayer)")
-plt.savefig("results/filtration_resistance-filtration_efficiency-No_interlayer.png")
+plt.title("thickness - filtration_resistance Regression Result (No-Interlayer)")
+plt.savefig("results/thickness-filtration_resistance-No_interlayer.png")
+
+
+# 过滤阻力与过滤效率的关系
+# plt.figure(figsize=(10, 10))
+# model = LinearRegression()
+# model.fit(filtration_resistance, filtration_efficiency)
+# pred_y = model.predict(filtration_resistance)
+#
+# outliers_idx = []
+# for i in range(len(filtration_resistance)):
+#     threshold = 10  # 自定的
+#     if abs(pred_y[i] - filtration_efficiency[i]) > threshold:
+#         outliers_idx.append(i)
+#
+# plt.plot(filtration_resistance[outliers_idx], filtration_efficiency[outliers_idx], 'r.', label="outliers")
+# filtration_resistance = np.delete(filtration_resistance, outliers_idx).reshape(-1, 1)
+# filtration_efficiency = np.delete(filtration_efficiency, outliers_idx).reshape(-1, 1)
+# plt.plot(filtration_resistance, filtration_efficiency, 'g.', label="original data")
+#
+# model = LinearRegression()
+# model.fit(filtration_resistance, filtration_efficiency)
+# pred_y = model.predict(filtration_resistance)
+# print(f"filtration_efficiency = {model.coef_[0]} * filtration_resistance + {model.intercept_[0]}")
+#
+# loss = mean_squared_error(filtration_efficiency, pred_y)
+# print(f"loss: {loss}")
+#
+# sorted_x = np.sort(filtration_resistance, axis=0)
+# sorted_pred_y = model.predict(sorted_x)
+# plt.plot(sorted_x, sorted_pred_y, label="Regression Model")
+# plt.xlabel("filtration_resistance(Pa)")
+# plt.ylabel("filtration_efficiency(%)")
+# plt.legend()
+# plt.title("filtration_resistance - filtration_efficiency Regression Result (No-Interlayer)")
+# plt.savefig("results/filtration_resistance-filtration_efficiency-No_interlayer.png")
 
 #  厚度与孔隙率的关系
 # plt.figure(figsize=(10, 10))

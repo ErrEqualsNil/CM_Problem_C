@@ -13,3 +13,11 @@ loss: 1.7845222090345034
 [filtration_resistance-filtration_efficiency-No_interlayer]
 filtration_efficiency = [1.48315702] * filtration_resistance + -9.657182959002618
 loss: 17.909859228655126
+
+[thickness-filtration_resistance-Interlayer]
+filtration_resistance = [-7.74862789] * thickness + 49.101212808739774
+loss: 2.2694770841928995
+
+[thickness-filtration_resistance-No_interlayer]
+filtration_resistance = [-10.06660615] * thickness + 45.000848272662935
+loss: 38.71422125553685
